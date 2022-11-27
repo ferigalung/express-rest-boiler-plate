@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 // routes
-app.use('/members/v1', require('./app/routes/members'));
+// app.use('/members/v1', require('./app/routes/members'));
 
 app.listen(port, () => {
   console.log(`${pkg.name} running and listening on port ${port}`);
