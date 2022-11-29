@@ -1,5 +1,5 @@
 {
-  "name": "express-crash-course",
+  "name": "express-rest-boiler-plate",
   "version": "1.0.0",
   "description": "learning crud in express",
   "main": "index.js",

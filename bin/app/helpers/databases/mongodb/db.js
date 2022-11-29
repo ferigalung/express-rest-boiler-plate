@@ -26,9 +26,9 @@ const findOne = async (dbConfig, params) => {
     return await collection.findOne(params);
   } catch (error) {
     if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findOne'); // special case for some reason
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findOne');
     }
-    throw error; // still want to crash
+    throw error;
   }
 };
 
@@ -39,9 +39,53 @@ const findMany = async (dbConfig, params) => {
     return await collection.find(params).toArray();
   } catch (error) {
     if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany'); // special case for some reason
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany');
     }
-    throw error; // still want to crash
+    throw error;
+  }
+};
+
+const insertOne = async (dbConfig, docs) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    await collection.insertOne(docs);
+    return docs;
+  } catch (error) {
+    if (error) {
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'insertOne');
+    }
+    throw error;
+  }
+};
+
+const updateOne = async (dbConfig, params, docs) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    await collection.updateOne(params, { $set: docs });
+    return await collection.findOne(params);
+  } catch (error) {
+    if (error) {
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'updateOne');
+    }
+    throw error;
+  }
+};
+
+const deleteOne = async (dbConfig, params) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    const deleteOne = await collection.deleteOne(params);
+    if (deleteOne.deletedCount === 0) {
+      throw Error('No data affected');
+    }
+  } catch (error) {
+    if (error) {
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'deleteOne');
+    }
+    throw error;
   }
 };
 
@@ -49,5 +93,8 @@ module.exports = {
   connectToDb,
   getDb,
   findOne,
-  findMany
+  findMany,
+  insertOne,
+  updateOne,
+  deleteOne
 };

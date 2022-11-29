@@ -7,10 +7,10 @@ const getAllMembers = async () => {
     logger.error(err, ctx, 'getAllMembers::findManyMembers');
     throw err;
   });
-  const mappedMember = members.map(item => ({
-    ...item,
-    newProp: 'test'
-  }));
+  const mappedMember = members.map(item => {
+    delete item.id;
+    return item;
+  });
   return mappedMember;
 };
 
