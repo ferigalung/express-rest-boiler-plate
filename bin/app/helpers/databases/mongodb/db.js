@@ -64,7 +64,7 @@ const updateOne = async (dbConfig, params, docs) => {
   const collection = db.collection(dbConfig.collection);
   try {
     await collection.updateOne(params, { $set: docs });
-    return await collection.findOne(params);
+    return collection.findOne(params);
   } catch (error) {
     if (error) {
       logger.error(`MongoDB error with error msg: ${error}`, ctx, 'updateOne');

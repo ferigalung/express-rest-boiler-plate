@@ -1,7 +1,8 @@
-const wrapper = (msg, data = null, status = true) => ({
-  status,
+const wrapper = (msg, data = null) => ({
+  status: true,
   data,
-  msg
+  msg,
+  code: 200
 });
 
 module.exports = wrapper;
