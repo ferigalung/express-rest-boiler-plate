@@ -19,11 +19,11 @@ const connectToDb = (callback) => {
 
 const getDb = () => dbConnection;
 
-const findOne = async (dbConfig, params) => {
+const findOne = async (dbConfig, { params = {}, projects = {} }) => {
   const db = dbConnection.db(dbConfig.dbName || dbName);
   const collection = db.collection(dbConfig.collection);
   try {
-    return await collection.findOne(params);
+    return collection.findOne(params, { projection: projects });
   } catch (error) {
     if (error) {
       logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findOne');
@@ -32,11 +32,34 @@ const findOne = async (dbConfig, params) => {
   }
 };
 
-const findMany = async (dbConfig, params) => {
+const findMany = async (dbConfig, { params, projects = {} }) => {
   const db = dbConnection.db(dbConfig.dbName || dbName);
   const collection = db.collection(dbConfig.collection);
   try {
-    return await collection.find(params).toArray();
+    return collection.find(params).project(projects).toArray();
+  } catch (error) {
+    if (error) {
+      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany');
+    }
+    throw error;
+  }
+};
+
+const findPaginated = async (dbConfig, { params = {}, page, size, sortParams = {}, projects = {} }) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  const offset = ((page - 1) * size) || 0;
+  try {
+    const result = await collection.find(params).project(projects).sort(sortParams).skip(offset).limit(size).toArray();
+    const count = await collection.count(params);
+    const meta = {
+      page,
+      size,
+      totalData: count || 0,
+      totalPage: count > 0 ? Math.round(count / size) : 0,
+      totalDataOnPage: result.length
+    };
+    return { result, meta };
   } catch (error) {
     if (error) {
       logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany');
@@ -96,5 +119,6 @@ module.exports = {
   findMany,
   insertOne,
   updateOne,
-  deleteOne
+  deleteOne,
+  findPaginated
 };

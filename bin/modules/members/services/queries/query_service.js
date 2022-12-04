@@ -3,18 +3,14 @@ const logger = require('../../../../app/helpers/utils/logger');
 const ctx = 'members::query_service';
 const { InternalServerError, UnprocessableEntityError } = require('../../../../app/helpers/errors');
 
-const getAllMembers = async () => {
-  const members = await query.findManyMembers({})
+const getAllMembers = async (payload) => {
+  const { page, size, search, sortBy, order } = payload;
+
+  return query.findPaginatedMembers({ search, page, size, sortBy, order })
     .catch(err => {
       logger.error(err, ctx, 'getAllMembers::findManyMembers');
       throw new InternalServerError();
     });
-
-  const mappedMember = members.map(item => {
-    delete item._id;
-    return item;
-  });
-  return mappedMember;
 };
 
 const getOneMember = async (payload) => {
@@ -26,7 +22,6 @@ const getOneMember = async (payload) => {
     throw new UnprocessableEntityError(`No member found with id of "${payload.memberId}"`);
   }
 
-  delete member._id;
   return member;
 };
 
