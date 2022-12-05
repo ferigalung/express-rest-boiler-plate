@@ -6,10 +6,22 @@ const port = process.env.PORT || 3000;
 const { connectToDb } = require('./bin/app/helpers/databases/mongodb/db');
 const wrapper = require('./bin/app/helpers/utils/wrapper');
 const logger = require('./bin/app/helpers/utils/logger');
+const basicAuth = require('express-basic-auth');
 
 // Init middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+app.use(basicAuth({
+  users: {
+    admin: 'admin'
+  },
+  unauthorizedResponse: {
+    success: false,
+    data: null,
+    msg: 'Unauthorized Error!',
+    code: 401
+  }
+}));
 
 // db connection
 connectToDb(err => {
@@ -25,7 +37,7 @@ connectToDb(err => {
 
 // default route
 app.get('/', (req, res) => {
-  res.json(wrapper(null, null, `${pkg.name} running perfectly`));
+  res.json(wrapper(`${pkg.name} running perfectly`));
 });
 
 // routes
