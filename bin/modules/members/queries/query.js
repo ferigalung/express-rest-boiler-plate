@@ -1,4 +1,4 @@
-const db = require('../../../../app/helpers/databases/mongodb/db');
+const db = require('../../../app/helpers/databases/mongodb/db');
 
 const findManyMembers = async (params) => {
   return db.findMany({ collection: 'members' }, { params, projects: { _id: 0 } });

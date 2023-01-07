@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const handler = require('../../modules/members/handlers/api_handlers');
+const commandHandler = require('../../modules/members/commands/handler');
+const queryhandler = require('../../modules/members/queries/handler');
+// const jwtAuth = require('../helpers/auth/jwtAuth');
 
-router.get('/', handler.getAllMembers);
-router.get('/:memberId', handler.getOneMember);
-router.post('/', handler.postInsertOneMember);
-router.put('/:memberId', handler.putUpdateOneMember);
-router.delete('/:memberId', handler.deleteOneMember);
+router.get('/', queryhandler.getAllMembers);
+router.get('/:memberId', queryhandler.getOneMember);
+router.post('/', commandHandler.postInsertOneMember);
+router.put('/:memberId', commandHandler.putUpdateOneMember);
+router.delete('/:memberId', commandHandler.deleteOneMember);
 
 module.exports = router;

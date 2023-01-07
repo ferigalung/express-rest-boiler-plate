@@ -25,10 +25,8 @@ const findOne = async (dbConfig, { params = {}, projects = {} }) => {
   try {
     return collection.findOne(params, { projection: projects });
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findOne');
-    }
-    throw error;
+    logger.error(error, ctx, 'findOne');
+    throw new Error(error);
   }
 };
 
@@ -38,10 +36,8 @@ const findMany = async (dbConfig, { params, projects = {} }) => {
   try {
     return collection.find(params).project(projects).toArray();
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany');
-    }
-    throw error;
+    logger.error(error, ctx, 'findMany');
+    throw new Error(error);
   }
 };
 
@@ -61,10 +57,8 @@ const findPaginated = async (dbConfig, { params = {}, page, size, sortParams = {
     };
     return { result, meta };
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'findMany');
-    }
-    throw error;
+    logger.error(error, ctx, 'findPaginated');
+    throw new Error(error);
   }
 };
 
@@ -75,10 +69,8 @@ const insertOne = async (dbConfig, docs) => {
     await collection.insertOne(docs);
     return docs;
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'insertOne');
-    }
-    throw error;
+    logger.error(error, ctx, 'insertOne');
+    throw new Error(error);
   }
 };
 
@@ -89,10 +81,8 @@ const updateOne = async (dbConfig, params, docs) => {
     await collection.updateOne(params, { $set: docs });
     return collection.findOne(params);
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'updateOne');
-    }
-    throw error;
+    logger.error(error, ctx, 'updateOne');
+    throw new Error(error);
   }
 };
 
@@ -105,10 +95,8 @@ const deleteOne = async (dbConfig, params) => {
       throw Error('No data affected');
     }
   } catch (error) {
-    if (error) {
-      logger.error(`MongoDB error with error msg: ${error}`, ctx, 'deleteOne');
-    }
-    throw error;
+    logger.error(error, ctx, 'deleteOne');
+    throw new Error(error);
   }
 };
 
