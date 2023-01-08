@@ -7,7 +7,7 @@ const ctx = 'members::queries::handler';
 
 const getAllMembers = async (req, res, next) => {
   const { error, value } = validate(queryModel.getAllMembers, req.query);
-  if (error) { next(error); }
+  if (error) { return next(error); }
 
   try {
     const members = await domain.getAllMembers(value);
@@ -20,7 +20,7 @@ const getAllMembers = async (req, res, next) => {
 
 const getOneMember = async (req, res, next) => {
   const { error, value } = validate(queryModel.getOneMember, req.params);
-  if (error) { next(error); }
+  if (error) { return next(error); }
 
   try {
     const result = await domain.getOneMember(value);

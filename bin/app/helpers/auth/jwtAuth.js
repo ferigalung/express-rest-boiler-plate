@@ -1,32 +1,27 @@
 const jose = require('jose');
 const { jwtSecretKey } = require('../../configs/global_config');
-const { InternalServerError, UnauthorizedError } = require('../errors');
+const { UnauthorizedError } = require('../errors');
 const logger = require('../utils/logger');
+const query = require('../../../modules/users/queries/query');
 
 const verifyJwt = async (req, res, next) => {
-  // Extract the JWT from the Authorization header
   const authorizationHeader = req.headers.authorization;
   const jwt = authorizationHeader?.split(' ')[1] || '';
-
-  // Verify the JWT using the JWT.verify() method
   try {
     const decodedJwt = await jose.jwtVerify(jwt, jwtSecretKey);
-    // If the JWT is valid, add the decoded JWT payload to the request object
-    if (decodedJwt) {
-      req.user = decodedJwt;
-    } else {
-      // If the JWT is invalid, return a 401 Unauthorized response
-      throw new UnauthorizedError('Invalid or expired token!');
+    req.user = await query.findOneUser({ userId: decodedJwt.payload?.id });
+    if (!req.user) {
+      throw new UnauthorizedError('Unauthorized Error - user not found!');
     }
   } catch (err) {
     logger.error(err, 'jwtAuth', 'verifyJwt');
-    if (err.code === 401) {
-      next(err);
+    res.setHeader('WWW-Authenticate', 'Bearer realm="admin"');
+    if (typeof (err.code) !== 'number') {
+      return next(new UnauthorizedError('Unauthorized Error - invalid or expired token!'));
     }
-    next(new InternalServerError('Failed to verify jwt'));
+    return next(err);
   }
 
-  // Call the next middleware function
   next();
 };
 

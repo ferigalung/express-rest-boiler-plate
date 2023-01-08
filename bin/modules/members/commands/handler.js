@@ -7,7 +7,7 @@ const ctx = 'members::commands::handler';
 
 const postInsertOneMember = async (req, res, next) => {
   const { error, value } = validate(commandModel.insertOneMember, req.body);
-  if (error) { next(error); }
+  if (error) { return next(error); }
 
   try {
     const result = await domain.insertOneMember(value);
@@ -23,7 +23,7 @@ const putUpdateOneMember = async (req, res, next) => {
     ...req.body,
     memberId: req.params.memberId
   });
-  if (error) { next(error); }
+  if (error) { return next(error); }
 
   try {
     const result = await domain.updateOneMember(value);
@@ -36,7 +36,7 @@ const putUpdateOneMember = async (req, res, next) => {
 
 const deleteOneMember = async (req, res, next) => {
   const { error, value } = validate(commandModel.deleteOneMember, req.params);
-  if (error) { next(error); }
+  if (error) { return next(error); }
 
   try {
     const result = await domain.deleteOneMember(value);

@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const commandHandler = require('../../modules/members/commands/handler');
 const queryhandler = require('../../modules/members/queries/handler');
-// const jwtAuth = require('../helpers/auth/jwtAuth');
+const { verifyJwt } = require('../helpers/auth/jwtAuth');
 
-router.get('/', queryhandler.getAllMembers);
-router.get('/:memberId', queryhandler.getOneMember);
-router.post('/', commandHandler.postInsertOneMember);
-router.put('/:memberId', commandHandler.putUpdateOneMember);
-router.delete('/:memberId', commandHandler.deleteOneMember);
+router.get('/', verifyJwt, queryhandler.getAllMembers);
+router.get('/:memberId', verifyJwt, queryhandler.getOneMember);
+router.post('/', verifyJwt, commandHandler.postInsertOneMember);
+router.put('/:memberId', verifyJwt, commandHandler.putUpdateOneMember);
+router.delete('/:memberId', verifyJwt, commandHandler.deleteOneMember);
 
 module.exports = router;

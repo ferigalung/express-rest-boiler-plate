@@ -1,9 +1,10 @@
 const errorHandling = (err, req, res, next) => {
-  return res.status(err.code).json({
+  const code = typeof (err.code) === 'number' ? err.code : 500;
+  return res.status(code).json({
     status: false,
     data: err.data || null,
-    msg: err.msg || 'Internal Server Error!',
-    code: err.code || 500
+    msg: err.msg || err || 'Internal Server Error!',
+    code
   });
 };
 
