@@ -4,7 +4,10 @@ const member = {
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   age: Joi.number().integer().positive().max(150).required(),
-  memberType: Joi.string().valid('basic', 'ultimate').default('basic')
+  memberType: Joi.string().valid('basic', 'ultimate').default('basic'),
+  profilePic: Joi.object({
+    mimetype: Joi.string().valid('image/png', 'image/jpg', 'image/jpeg', 'image/PNG', 'image/JPG', 'image/JPEG').required()
+  }).unknown().optional()
 };
 const insertOneMember = Joi.object(member);
 

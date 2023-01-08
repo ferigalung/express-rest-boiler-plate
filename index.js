@@ -7,10 +7,11 @@ const { connectToDb } = require('./bin/app/helpers/databases/mongodb/db');
 const logger = require('./bin/app/helpers/utils/logger');
 const wrapper = require('./bin/app/helpers/utils/wrapper');
 const errorHandling = require('./bin/app/helpers/errors/global_error_handler');
+const minio = require('./bin/app/helpers/utils/minio');
 
 // Init middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // default route
 app.get('/', (req, res) => {
@@ -23,6 +24,9 @@ app.use('/users/v1', require('./bin/app/routes/users'));
 
 // error handling
 app.use(errorHandling);
+
+// minio init
+minio.init();
 
 // db connection
 connectToDb(err => {

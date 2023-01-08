@@ -6,7 +6,10 @@ const logger = require('../../../app/helpers/utils/logger');
 const ctx = 'members::commands::handler';
 
 const postInsertOneMember = async (req, res, next) => {
-  const { error, value } = validate(commandModel.insertOneMember, req.body);
+  const { error, value } = validate(commandModel.insertOneMember, {
+    ...req.body,
+    profilePic: req.file
+  });
   if (error) { return next(error); }
 
   try {
@@ -21,6 +24,7 @@ const postInsertOneMember = async (req, res, next) => {
 const putUpdateOneMember = async (req, res, next) => {
   const { error, value } = validate(commandModel.updateOneMember, {
     ...req.body,
+    profilePic: req.file,
     memberId: req.params.memberId
   });
   if (error) { return next(error); }

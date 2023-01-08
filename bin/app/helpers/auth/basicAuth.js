@@ -1,7 +1,7 @@
 const auth = require('basic-auth');
 const { UnauthorizedError } = require('../errors');
 const compare = require('tsscmp');
-const { basicAuthName, basicAuthPass } = require('../../configs/global_config');
+const { basicAuthConfig } = require('../../configs/global_config');
 
 const basicAuth = (req, res, next) => {
   const credential = auth(req);
@@ -13,7 +13,7 @@ const basicAuth = (req, res, next) => {
 };
 
 const check = (credential) => {
-  if (compare(credential.name, basicAuthName) && compare(credential.pass, basicAuthPass)) {
+  if (compare(credential.name, basicAuthConfig.name) && compare(credential.pass, basicAuthConfig.pass)) {
     return true;
   }
   return false;
