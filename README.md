@@ -1,6 +1,6 @@
 # Express Rest Boiler Plate
 
-This is a codebase/boilerplate of Back End REST API using *express*. You can use it as a starter project for creating API.
+This is a codebase/boilerplate for Back End REST API using *express*. You can use it as a starter project for creating APIs.
 
 ## Stack Used
 
