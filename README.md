@@ -8,6 +8,8 @@ This is a codebase/boilerplate for Back End REST API using *express*. You can us
 - mongoDB (for databases)
 - minio (for object storage)
 - Joi (for input validation)
+- jose (for JWT sign & verification)
+- argon2 (for password hashing)
 
 ## Folder Structures
 
