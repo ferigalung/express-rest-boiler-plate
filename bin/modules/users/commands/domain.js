@@ -32,10 +32,15 @@ const registerUser = async (payload) => {
 const loginUser = async (payload) => {
   const { username, password } = payload;
 
+  const unauthorizedError = new UnprocessableEntityError('Invalid username or password!');
   const user = await query.findOneUser({ username });
+  if (!user) {
+    throw unauthorizedError;
+  }
+
   const verifyPassword = await argon2.verify(user.password, password);
-  if (!user || !verifyPassword) {
-    throw new UnprocessableEntityError('Invalid username or password!');
+  if (!verifyPassword) {
+    throw unauthorizedError;
   }
 
   const token = await new SignJWT({ id: user.userId })
