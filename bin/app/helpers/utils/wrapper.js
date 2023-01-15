@@ -1,20 +1,11 @@
-const error = (params, meta) => ({
-  success: false,
-  data: params.data || null,
-  msg: params.msg || 'Unknown Error!',
-  code: params.code || 500,
-  meta
-});
-
-const success = (params, meta) => ({
+const success = (data = null, meta, msg = 'Successfully process the request!', code = 200) => ({
   success: true,
-  data: params.data || null,
-  msg: params.msg || 'Successfully process the request!',
-  code: params.code || 200,
+  data,
+  msg,
+  code,
   meta
 });
 
 module.exports = {
-  error,
   success
 };
