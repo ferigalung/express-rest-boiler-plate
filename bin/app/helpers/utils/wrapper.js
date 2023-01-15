@@ -1,4 +1,4 @@
-const success = (data = null, meta, msg = 'Successfully process the request!', code = 200) => ({
+const success = ({ data = null, meta, msg = 'Successfully process the request!', code = 200 }) => ({
   success: true,
   data,
   msg,
