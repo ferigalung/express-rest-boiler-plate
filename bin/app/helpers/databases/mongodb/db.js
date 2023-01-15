@@ -100,6 +100,18 @@ const deleteOne = async (dbConfig, params) => {
   }
 };
 
+const insertMany = async (dbConfig, docs) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    await collection.insertMany(docs);
+    return docs;
+  } catch (error) {
+    logger.error(error, ctx, 'insertMany');
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   connectToDb,
   getDb,
@@ -108,5 +120,6 @@ module.exports = {
   insertOne,
   updateOne,
   deleteOne,
-  findPaginated
+  findPaginated,
+  insertMany
 };

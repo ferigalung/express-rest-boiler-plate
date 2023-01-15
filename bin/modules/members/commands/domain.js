@@ -9,7 +9,6 @@ const path = require('path');
 const uploadProfilePic = async (profilePic, memberId) => {
   const filename = `profilePic-${memberId}${path.extname(profilePic.originalname)}`;
   await minio.bufferObjectUpload({
-    bucketName: 'members',
     objectName: filename,
     buffer: profilePic.buffer,
     meta: { 'Content-Type': profilePic.mimetype }
@@ -25,7 +24,6 @@ const insertOneMember = async (payload) => {
   if (profilePic) {
     filename = await uploadProfilePic(profilePic, memberId);
     profilePicUrl = await minio.objectGetUrl({
-      bucketName: 'members',
       objectName: filename
     });
   }
@@ -68,7 +66,6 @@ const updateOneMember = async (payload) => {
   });
 
   const profilePicUrl = await minio.objectGetUrl({
-    bucketName: 'members',
     objectName: filename
   });
   delete updateOne._id;
