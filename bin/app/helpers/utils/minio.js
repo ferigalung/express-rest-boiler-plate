@@ -8,7 +8,7 @@ const ctx = 'minio';
 const init = () => {
   try {
     minioClient = new Minio.Client(minioConfig);
-    bucketCreate('members');
+    bucketCreate(minioConfig.bucketName, true);
     logger.info('minio initialized', ctx, 'minio-init');
   } catch (err) {
     logger.error(err, ctx, 'minio-init');
@@ -24,13 +24,34 @@ const isBucketExists = async (bucketName) => {
   }
 };
 
-const bucketCreate = async (bucketName, region = 'us-east-1') => {
+const bucketCreate = async (bucketName, isPublic = false, region = 'us-east-1') => {
   try {
     const isExists = await isBucketExists(bucketName);
     if (isExists) {
       return true;
     }
     await minioClient.makeBucket(bucketName, region);
+
+    if (isPublic === true) {
+      const policy = `{
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "PublicRead",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${bucketName}/*"
+            ]
+          }
+        ]
+      }`;
+      await minioClient.setBucketPolicy(bucketName, policy);
+    }
+
     return true;
   } catch (err) {
     logger.error(err, ctx, 'bucketCreate');
@@ -38,7 +59,7 @@ const bucketCreate = async (bucketName, region = 'us-east-1') => {
   }
 };
 
-const bucketRemove = async (bucketName, region = 'us-east-1') => {
+const bucketRemove = async (bucketName = minioConfig.bucketName, region = 'us-east-1') => {
   try {
     await minioClient.removeBucket(bucketName, region);
     return true;
@@ -48,7 +69,7 @@ const bucketRemove = async (bucketName, region = 'us-east-1') => {
   }
 };
 
-const objectUpload = async ({ bucketName, objectName, filePath, meta }) => {
+const objectUpload = async ({ bucketName = minioConfig.bucketName, objectName, filePath, meta }) => {
   try {
     return minioClient.fPutObject(bucketName, objectName, filePath, meta);
   } catch (err) {
@@ -57,16 +78,17 @@ const objectUpload = async ({ bucketName, objectName, filePath, meta }) => {
   }
 };
 
-const bufferObjectUpload = async ({ bucketName, objectName, buffer, meta }) => {
+const bufferObjectUpload = async ({ bucketName = minioConfig.bucketName, objectName, buffer, meta }) => {
   try {
-    return minioClient.putObject(bucketName, objectName, buffer, meta);
+    await minioClient.putObject(bucketName, objectName, buffer, meta);
+    return objectName;
   } catch (err) {
     logger.error(err, ctx, 'bufferObjectUpload');
     throw new InternalServerError(err.message);
   }
 };
 
-const objectDownload = async ({ bucketName, objectName, filePath }) => {
+const objectDownload = async ({ bucketName = minioConfig.bucketName, objectName, filePath }) => {
   try {
     return minioClient.fGetObject(bucketName, objectName, filePath);
   } catch (err) {
@@ -75,7 +97,7 @@ const objectDownload = async ({ bucketName, objectName, filePath }) => {
   }
 };
 
-const objectRemove = async (bucketName, objectName) => {
+const objectRemove = async ({ bucketName = minioConfig.bucketName, objectName }) => {
   try {
     await minioClient.removeObject(bucketName, objectName);
     return true;
@@ -85,7 +107,7 @@ const objectRemove = async (bucketName, objectName) => {
   }
 };
 
-const objectGetUrl = async ({ bucketName, objectName, expiry = 604800 }) => {
+const objectGetUrl = async ({ bucketName = minioConfig.bucketName, objectName, expiry = 604800 }) => {
   try {
     return minioClient.presignedGetObject(bucketName, objectName, expiry);
   } catch (err) {
