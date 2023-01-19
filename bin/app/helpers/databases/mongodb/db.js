@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const { mongoDbUrl, dbName } = require('../../../configs/global_config');
+const { InternalServerError } = require('../../errors');
 const mongoClient = new MongoClient(mongoDbUrl);
 const logger = require('../../utils/logger');
 const ctx = 'mongodb::db';
@@ -26,7 +27,7 @@ const findOne = async (dbConfig, { params = {}, projects = {} }) => {
     return collection.findOne(params, { projection: projects });
   } catch (error) {
     logger.error(error, ctx, 'findOne');
-    throw new Error(error);
+    throw new InternalServerError(error.message, error);
   }
 };
 
@@ -37,7 +38,7 @@ const findMany = async (dbConfig, { params, projects = {} }) => {
     return collection.find(params).project(projects).toArray();
   } catch (error) {
     logger.error(error, ctx, 'findMany');
-    throw new Error(error);
+    throw new InternalServerError(error.message, error);
   }
 };
 
@@ -58,7 +59,7 @@ const findPaginated = async (dbConfig, { params = {}, page, size, sortParams = {
     return { result, meta };
   } catch (error) {
     logger.error(error, ctx, 'findPaginated');
-    throw new Error(error);
+    throw new InternalServerError(error.message, error);
   }
 };
 
@@ -70,33 +71,7 @@ const insertOne = async (dbConfig, docs) => {
     return docs;
   } catch (error) {
     logger.error(error, ctx, 'insertOne');
-    throw new Error(error);
-  }
-};
-
-const updateOne = async (dbConfig, params, docs) => {
-  const db = dbConnection.db(dbConfig.dbName || dbName);
-  const collection = db.collection(dbConfig.collection);
-  try {
-    await collection.updateOne(params, { $set: docs });
-    return collection.findOne(params);
-  } catch (error) {
-    logger.error(error, ctx, 'updateOne');
-    throw new Error(error);
-  }
-};
-
-const deleteOne = async (dbConfig, params) => {
-  const db = dbConnection.db(dbConfig.dbName || dbName);
-  const collection = db.collection(dbConfig.collection);
-  try {
-    const deleteOne = await collection.deleteOne(params);
-    if (deleteOne.deletedCount === 0) {
-      throw Error('No data affected');
-    }
-  } catch (error) {
-    logger.error(error, ctx, 'deleteOne');
-    throw new Error(error);
+    throw new InternalServerError(error.message, error);
   }
 };
 
@@ -108,7 +83,41 @@ const insertMany = async (dbConfig, docs) => {
     return docs;
   } catch (error) {
     logger.error(error, ctx, 'insertMany');
-    throw new Error(error);
+    throw new InternalServerError(error.message, error);
+  }
+};
+
+const updateOne = async (dbConfig, params, docs) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    await collection.updateOne(params, { $set: docs });
+    return collection.findOne(params);
+  } catch (error) {
+    logger.error(error, ctx, 'updateOne');
+    throw new InternalServerError(error.message, error);
+  }
+};
+
+const deleteOne = async (dbConfig, params) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    return collection.deleteOne(params);
+  } catch (error) {
+    logger.error(error, ctx, 'deleteOne');
+    throw new InternalServerError(error.message, error);
+  }
+};
+
+const deleteMany = async (dbConfig, params) => {
+  const db = dbConnection.db(dbConfig.dbName || dbName);
+  const collection = db.collection(dbConfig.collection);
+  try {
+    return collection.deleteMany(params);
+  } catch (error) {
+    logger.error(error, ctx, 'deleteMany');
+    throw new InternalServerError(error.message, error);
   }
 };
 
@@ -121,5 +130,6 @@ module.exports = {
   updateOne,
   deleteOne,
   findPaginated,
-  insertMany
+  insertMany,
+  deleteMany
 };
